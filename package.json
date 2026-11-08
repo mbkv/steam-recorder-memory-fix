@@ -15,11 +15,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test tests/cleanup.test.mjs",
-    "build": "mkdir -p dist && starlight pack --release",
-    "check-artifact": "node --test tests/artifact.test.mjs",
-    "format": "prettier --write frontend tests",
-    "format:check": "prettier --check frontend tests",
+    "test": "bun test tests/cleanup.test.mjs",
+    "build": "mkdir -p dist && bun --bun run starlight pack --release",
+    "check-artifact": "bun test tests/artifact.test.mjs",
+    "format": "bun --bun run prettier --write frontend tests",
+    "format:check": "bun --bun run prettier --check frontend tests",
     "release": "bun run format:check && bun run test && bun run build && bun run check-artifact"
   },
   "devDependencies": {

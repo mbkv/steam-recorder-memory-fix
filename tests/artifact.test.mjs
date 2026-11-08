@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { test } from 'node:test';
+import { onTestFinished, test } from 'bun:test';
 import { fileURLToPath } from 'node:url';
 import { createContext, runInContext } from 'node:vm';
 import { createPlayerFixture } from './player-fixture.mjs';
@@ -52,13 +52,13 @@ async function loadPlugin(fixture, available = true) {
   return { props, logs };
 }
 
-test('compiled plugin applies cleanup and restores player methods on unload', async (context) => {
+test('compiled plugin applies cleanup and restores player methods on unload', async () => {
   const fixture = createPlayerFixture();
   const { Player, revoked } = fixture;
   const originalInit = Player.prototype.InitVideoControl;
   const originalClose = Player.prototype.Close;
   const { props } = await loadPlugin(fixture);
-  context.after(() => props.onDismount());
+  onTestFinished(() => props.onDismount());
 
   const player = new Player();
   player.InitVideoControl();
@@ -77,10 +77,10 @@ test('compiled plugin applies cleanup and restores player methods on unload', as
   assert.equal(revoked.length, 1);
 });
 
-test('compiled plugin reports an unavailable player without changing playback', async (context) => {
+test('compiled plugin reports an unavailable player without changing playback', async () => {
   const fixture = createPlayerFixture();
   const { props, logs } = await loadPlugin(fixture, false);
-  context.after(() => props.onDismount());
+  onTestFinished(() => props.onDismount());
 
   const player = new fixture.Player();
   player.InitVideoControl();

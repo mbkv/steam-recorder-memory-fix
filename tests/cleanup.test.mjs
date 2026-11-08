@@ -1,16 +1,16 @@
 import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { onTestFinished, test } from 'bun:test';
 import { installRecordingCleanup } from '../frontend/cleanup.js';
 import { createPlayerFixture } from './player-fixture.mjs';
 
-function setup(context, manifest) {
+function setup(manifest) {
   const fixture = createPlayerFixture(manifest);
-  context.after(installRecordingCleanup(fixture.Player, fixture.options));
+  onTestFinished(installRecordingCleanup(fixture.Player, fixture.options));
   return { ...fixture, player: new fixture.Player() };
 }
 
-test('repeated clip switches release URLs and reset closed videos', (context) => {
-  const { player, urls, errors, events } = setup(context);
+test('repeated clip switches release URLs and reset closed videos', () => {
+  const { player, urls, errors, events } = setup();
 
   for (let i = 0; i < 40; i++) {
     assert.equal(player.InitVideoControl(123), 123);
@@ -25,8 +25,8 @@ test('repeated clip switches release URLs and reset closed videos', (context) =>
   assert.deepEqual(events.slice(0, 2), ['original close', 'revoke']);
 });
 
-test('source replacement revokes the old URL without resetting the new clip', (context) => {
-  const { player, revoked, urls } = setup(context);
+test('source replacement revokes the old URL without resetting the new clip', () => {
+  const { player, revoked, urls } = setup();
   player.InitVideoControl();
   player.InitVideoControl();
 
@@ -39,20 +39,20 @@ test('source replacement revokes the old URL without resetting the new clip', (c
   assert.equal(urls.size, 0);
 });
 
-test('players already open at installation are cleaned up on close', (context) => {
+test('players already open at installation are cleaned up on close', () => {
   const { Player, options, urls } = createPlayerFixture();
   const player = new Player();
   player.InitVideoControl();
 
-  context.after(installRecordingCleanup(Player, options));
+  onTestFinished(installRecordingCleanup(Player, options));
   player.Close();
 
   assert.equal(urls.size, 0);
   assert.equal(player.m_elVideo.loads, 1);
 });
 
-test('a source assigned by Steam during close is preserved', (context) => {
-  const { player, revoked } = setup(context);
+test('a source assigned by Steam during close is preserved', () => {
+  const { player, revoked } = setup();
   player.InitVideoControl();
   player.onClose = () => {
     player.m_elVideo.src = 'blob:next-clip';
@@ -64,8 +64,8 @@ test('a source assigned by Steam during close is preserved', (context) => {
   assert.equal(player.m_elVideo.loads, 0);
 });
 
-test('repeated close calls do not repeatedly reset a disposed video', (context) => {
-  const { player, revoked } = setup(context);
+test('repeated close calls do not repeatedly reset a disposed video', () => {
+  const { player, revoked } = setup();
   player.InitVideoControl();
   player.Close();
   player.Close();
@@ -74,14 +74,14 @@ test('repeated close calls do not repeatedly reset a disposed video', (context) 
   assert.equal(player.m_elVideo.loads, 1);
 });
 
-test('unrelated Steam videos and remote manifests are left alone', (context) => {
+test('unrelated Steam videos and remote manifests are left alone', () => {
   const manifests = [
     'https://steamloopback.host/broadcast/session.mpd',
     'https://example.com/gamerecordings/session.mpd',
   ];
 
   for (const manifest of manifests) {
-    const { player, urls } = setup(context, manifest);
+    const { player, urls } = setup(manifest);
     player.InitVideoControl();
     player.Close();
 
@@ -90,19 +90,16 @@ test('unrelated Steam videos and remote manifests are left alone', (context) => 
   }
 });
 
-test('relative local recording manifests are supported', (context) => {
-  const { player, urls } = setup(
-    context,
-    '/gamerecordings/clips/test/session.mpd',
-  );
+test('relative local recording manifests are supported', () => {
+  const { player, urls } = setup('/gamerecordings/clips/test/session.mpd');
   player.InitVideoControl();
   player.Close();
 
   assert.equal(urls.size, 0);
 });
 
-test('cleanup runs even when Steam close throws and preserves that exception', (context) => {
-  const { player, urls } = setup(context);
+test('cleanup runs even when Steam close throws and preserves that exception', () => {
+  const { player, urls } = setup();
   const error = new Error('Steam close failure');
   player.InitVideoControl();
 
@@ -114,7 +111,7 @@ test('cleanup runs even when Steam close throws and preserves that exception', (
   assert.equal(player.m_elVideo.loads, 1);
 });
 
-test('cleanup and logging failures cannot replace the original result or exception', (context) => {
+test('cleanup and logging failures cannot replace the original result or exception', () => {
   const { Player } = createPlayerFixture();
   const warnings = [];
   const uninstall = installRecordingCleanup(Player, {
@@ -126,7 +123,7 @@ test('cleanup and logging failures cannot replace the original result or excepti
       throw new Error('logger error');
     },
   });
-  context.after(uninstall);
+  onTestFinished(uninstall);
 
   const player = new Player();
   player.InitVideoControl();
@@ -145,8 +142,8 @@ test('cleanup and logging failures cannot replace the original result or excepti
   );
 });
 
-test('capture errors do not stop Steam closing its player', (context) => {
-  const { player, errors } = setup(context);
+test('capture errors do not stop Steam closing its player', () => {
+  const { player, errors } = setup();
   player.InitVideoControl();
   player.m_elVideo.getAttribute = () => {
     throw new Error('attribute error');
@@ -156,7 +153,7 @@ test('capture errors do not stop Steam closing its player', (context) => {
   assert.equal(errors.length, 1);
 });
 
-test('unload restores descriptors and makes retained wrappers inert', (context) => {
+test('unload restores descriptors and makes retained wrappers inert', () => {
   const { Player, options, urls } = createPlayerFixture();
   const originalInit = Object.getOwnPropertyDescriptor(
     Player.prototype,
@@ -167,7 +164,7 @@ test('unload restores descriptors and makes retained wrappers inert', (context) 
     'Close',
   );
   const uninstall = installRecordingCleanup(Player, options);
-  context.after(uninstall);
+  onTestFinished(uninstall);
 
   const player = new Player();
   player.InitVideoControl();
@@ -188,11 +185,11 @@ test('unload restores descriptors and makes retained wrappers inert', (context) 
   );
 });
 
-test('plugin reload replaces previous hooks rather than stacking them', (context) => {
+test('plugin reload replaces previous hooks rather than stacking them', () => {
   const { Player, options, revoked } = createPlayerFixture();
   const first = installRecordingCleanup(Player, options);
   const second = installRecordingCleanup(Player, options);
-  context.after(second);
+  onTestFinished(second);
 
   first(); // A late unload of the old instance must not disable the new one.
   const player = new Player();

@@ -9,8 +9,7 @@ while the plugin is enabled
 
 1. Install [Millennium](https://steambrew.app/) with support for `.star` plugins.
 2. Download **steam-recorder-memory-fix.star** from the
-   [Releases page](https://github.com/mbkv/steam-recorder-memory-fix/releases).
-   You do not need Git, Bun, or the source ZIP.
+   [Releases page](https://github.com/mbkv/steam-recorder-memory-fix/releases)
 3. Close Steam and copy the file into your Millennium plugins directory.
 4. Start Steam, open **Millennium > Plugins**, and enable **Steam Recorder Memory
    Fix**. Restart Steam if prompted.
@@ -19,7 +18,7 @@ On Linux the plugins directory is `~/.local/share/millennium/plugins/`.
 
 ## Build
 
-Requires Bun and Node.js.
+Requires Bun 1.3.14 or newer.
 
 ```sh
 bun install --frozen-lockfile --ignore-scripts
