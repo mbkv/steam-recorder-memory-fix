@@ -1,0 +1,19 @@
+[plugin]
+id = "io.github.mbkv.steam-recorder-memory-fix"
+name = "Steam Recorder Memory Fix"
+version = "1.0.0"
+author = "Michael Bitokhov"
+description = "Release unused playback resources when switching or closing Steam recordings."
+
+[assets]
+resources = ["LICENSE"]
+
+[frontend]
+entry = "frontend/index.tsx"
+
+[compiler]
+output_path = "dist/steam-recorder-memory-fix.star"
+
+[logger]
+frontend_prefix = "Steam Recorder Memory Fix"
+

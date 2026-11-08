@@ -1,0 +1,30 @@
+{
+  "name": "steam-recorder-memory-fix",
+  "version": "1.0.0",
+  "description": "A Millennium plugin that releases unused Steam recording playback resources.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mbkv/steam-recorder-memory-fix.git"
+  },
+  "author": {
+    "name": "Michael Bitokhov",
+    "url": "https://github.com/mbkv"
+  },
+  "license": "0BSD",
+  "packageManager": "bun@1.3.14",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/cleanup.test.mjs",
+    "build": "mkdir -p dist && starlight pack --release",
+    "check-artifact": "node --test tests/artifact.test.mjs",
+    "format": "prettier --write frontend tests",
+    "format:check": "prettier --check frontend tests",
+    "release": "bun run format:check && bun run test && bun run build && bun run check-artifact"
+  },
+  "devDependencies": {
+    "@steambrew/starlight": "1.1.6",
+    "@types/react": "19.1.1",
+    "prettier": "3.9.10"
+  }
+}

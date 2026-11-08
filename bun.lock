@@ -1,0 +1,23 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "steam-recorder-memory-fix",
+      "devDependencies": {
+        "@steambrew/starlight": "1.1.6",
+        "@types/react": "19.1.1",
+        "prettier": "3.9.10",
+      },
+    },
+  },
+  "packages": {
+    "@steambrew/starlight": ["@steambrew/starlight@1.1.6", "", { "bin": { "starlight": "bin/starlight.js" } }, "sha512-M2tVnoGru9zfqI7mvJK6gizOVJX/AuYvHAKD1kbzxA1RUM8zRgL04Vk0bmVu0mVj4eHVXVkaa6+7eyBfHC++nA=="],
+
+    "@types/react": ["@types/react@19.1.1", "", { "dependencies": { "csstype": "^3.0.2" } }, "sha512-ePapxDL7qrgqSF67s0h9m412d9DbXyC1n59O2st+9rjuuamWsZuD2w55rqY12CbzsZ7uVXb5Nw0gEp9Z8MMutQ=="],
+
+    "csstype": ["csstype@3.2.3", "", {}, "sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ=="],
+
+    "prettier": ["prettier@3.9.10", "", { "bin": { "prettier": "bin/prettier.cjs" } }, "sha512-skGHTH1Yb9QvaTC4hWnRTzEYtCpApF0UMBPz+t/0ZPzP8ihefo/btKd+QA7pUE0fEwA1SbS/NmhyEcstdXOIdA=="],
+  }
+}
